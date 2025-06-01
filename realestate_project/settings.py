@@ -4,9 +4,10 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+SECRET_KEY = "+!%xzlk$5hnm)3ae5-%6e_of#iect-^jqo6xkd$n2b74h1ki_a"
+
+DEBUG = False
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
