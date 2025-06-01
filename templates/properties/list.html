@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mulklar - Ko'chmas Mulk Pro{% endblock %}
+
+{% block content %}
+<!-- Search Section -->
+<section class="bg-success text-white py-4">
+    <div class="container">
+        <h1 class="text-center mb-4">Barcha mulklarni ko'rish</h1>
+        
+        <div class="bg-white rounded p-4 shadow">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    {{ form.search_query }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.price_min }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.price_max }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.property_type }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.sort_by }}
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="mt-2 text-muted small">
+                {{ total_properties }} ta mulk topildi
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Properties Grid -->
+<section class="py-5">
+    <div class="container">
+        {% if properties %}
+        <div class="row">
+            {% for property in properties %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        {% if property.images.first %}
+                            <img src="{{ property.images.first.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200?text=Rasm+yo'q" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        
+                        {% if property.has_360_tour %}
+                        <span class="badge bg-success position-absolute top-0 start-0 m-2">
+                            <i class="bi bi-eye me-1"></i> 360° tur
+                        </span>
+                        {% endif %}
+                        
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-sm btn-light" onclick="addToComparison({{ property.id }})">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ property.title }}</h5>
+                            <div class="text-warning">
+                                <i class="bi bi-star-fill"></i>
+                                <small>{{ property.rating }}</small>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            {{ property.address|truncatechars:40 }}
+                        </p>
+                        
+                        <h4 class="text-success fw-bold mb-3">
+                            ${{ property.price|floatformat:0 }}
+                        </h4>
+                        
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span>{{ property.bedrooms }} xona</span>
+                            <span>{{ property.bathrooms }} hammom</span>
+                            <span>{{ property.area }} m²</span>
+                        </div>
+                        
+                        <small class="text-muted">{{ property.company.name }} tomonidan</small>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'property_detail' property.pk %}" class="btn btn-success flex-fill">
+                                Batafsil ko'rish
+                            </a>
+                            <button class="btn btn-outline-secondary">
+                                <i class="bi bi-chat-dots"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Sahifalash">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}">Oldingi</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.property_type %}&property_type={{ request.GET.property_type }}{% endif %}">Keyingi</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-house-x display-1 text-muted"></i>
+            <h3 class="mt-3">Mulklar topilmadi</h3>
+            <p class="text-muted">Qidiruv mezonlarini o'zgartirib ko'ring</p>
+            <a href="{% url 'properties_list' %}" class="btn btn-success">Barcha mulklarni ko'rish</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addToComparison(propertyId) {
+    fetch('{% url "add_to_comparison" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'property_id=' + propertyId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert('Mulk ' + (data.action === 'added' ? 'qo\'shildi' : 'olib tashlandi'));
+        }
+    });
+}
+</script>
+{% endblock %}

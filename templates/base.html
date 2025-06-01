@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ko'chmas Mulk Pro{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% load static %}{% static 'css/style.css' %}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-success" href="{% url 'home' %}">
+                <i class="bi bi-house-door-fill me-2"></i>
+                Ko'chmas Mulk Pro
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Bosh sahifa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'properties_list' %}">Mulklar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'companies_list' %}">Kompaniyalar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">Biz haqimizda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Aloqa</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Profil</a></li>
+                                {% if user.user_type in 'seller,agent,admin' %}
+                                    <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Admin Panel</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Chiqish</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-success me-2">Kirish</a>
+                        <a href="{% url 'register' %}" class="btn btn-success">Ro'yxatdan o'tish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-house-door-fill me-2 text-success"></i>
+                        Ko'chmas Mulk Pro
+                    </h5>
+                    <p class="text-light-emphasis">
+                        Mukammal mulk topishda sizning ishonchli hamkoringiz. Biz xaridorlar va 
+                        sotuvchilarni innovatsion texnologiya va shaxsiy xizmat orqali bog'laymiz.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-light-emphasis"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light-emphasis"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-light-emphasis"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light-emphasis"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Tezkor havolalar</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'properties_list' %}" class="text-light-emphasis text-decoration-none">Mulklarni ko'rish</a></li>
+                        <li><a href="{% url 'companies_list' %}" class="text-light-emphasis text-decoration-none">Rieltorlarni topish</a></li>
+                        <li><a href="{% url 'compare_properties' %}" class="text-light-emphasis text-decoration-none">Mulklarni solishtirish</a></li>
+                        <li><a href="{% url 'about' %}" class="text-light-emphasis text-decoration-none">Biz haqimizda</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="fw-bold mb-3">Xizmatlar</h6>
+                    <ul class="list-unstyled text-light-emphasis">
+                        <li>Mulk e'lonlari</li>
+                        <li>Virtual turlar</li>
+                        <li>Bozor tahlili</li>
+                        <li>Shartnoma tuzish</li>
+                        <li>Mijozlarni moslashtirish</li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3 mb-4">
+                    <h6 class="fw-bold mb-3">Biz bilan bog'laning</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-telephone-fill text-success me-2"></i>
+                        <span class="text-light-emphasis">+998 (90) 123-45-67</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-envelope-fill text-success me-2"></i>
+                        <span class="text-light-emphasis">info@kochmmasmulkpro.uz</span>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-geo-alt-fill text-success me-2 mt-1"></i>
+                        <span class="text-light-emphasis">Ko'chmas Mulk ko'chasi 123, Toshkent, O'zbekiston</span>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="border-secondary">
+            <div class="text-center text-light-emphasis">
+                <p>&copy; 2024 Ko'chmas Mulk Pro. Barcha huquqlar himoyalangan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% load static %}{% static 'js/main.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

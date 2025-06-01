@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bosh sahifa - Ko'chmas Mulk Pro{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-success text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-center text-lg-start">
+                <h1 class="display-4 fw-bold mb-4">Orzuingizdagi uyni toping</h1>
+                <p class="lead mb-4">
+                    Keng qamrovli ko'chmas mulk platformamiz orqali mukammal mulkni kashf eting. 
+                    Ishonchli rieltorlar bilan bog'laning va minglab e'lonlarni ko'rib chiqing.
+                </p>
+                
+                <!-- Search Form -->
+                <div class="bg-white rounded p-4 shadow">
+                    <form method="get" action="{% url 'properties_list' %}" class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" name="search_query" class="form-control" 
+                                       placeholder="Joylashuv, mulk turi bo'yicha qidiring...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="property_type" class="form-select text-dark">
+                                <option value="">Mulk turi</option>
+                                <option value="apartment">Kvartira</option>
+                                <option value="house">Uy</option>
+                                <option value="condo">Kondominiyum</option>
+                                <option value="villa">Villa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-search me-1"></i> Qidirish
+                            </button>
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
+                        <span>{{ total_properties }} dan ortiq mulk mavjud</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Tanlangan mulklar</h2>
+            <p class="lead text-muted">Ishonchli hamkorlarimizdan qo'lda tanlangan mulklar</p>
+        </div>
+        
+        <div class="row">
+            {% for property in featured_properties %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        {% if property.images.first %}
+                            <img src="{{ property.images.first.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200?text=Rasm+yo'q" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        
+                        {% if property.has_360_tour %}
+                        <span class="badge bg-success position-absolute top-0 start-0 m-2">
+                            <i class="bi bi-eye me-1"></i> 360° tur
+                        </span>
+                        {% endif %}
+                        
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <button class="btn btn-sm btn-light" onclick="addToComparison({{ property.id }})">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ property.title }}</h5>
+                            <div class="text-warning">
+                                <i class="bi bi-star-fill"></i>
+                                <small>{{ property.rating }}</small>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-geo-alt me-1"></i>
+                            {{ property.address|truncatechars:30 }}
+                        </p>
+                        
+                        <h4 class="text-success fw-bold mb-3">
+                            ${{ property.price|floatformat:0 }}
+                        </h4>
+                        
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span>{{ property.bedrooms }} xona</span>
+                            <span>{{ property.bathrooms }} hammom</span>
+                            <span>{{ property.area }} m²</span>
+                        </div>
+                        
+                        <small class="text-muted">{{ property.company.name }} tomonidan</small>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'property_detail' property.pk %}" class="btn btn-success flex-fill">
+                                Batafsil ko'rish
+                            </a>
+                            <button class="btn btn-outline-secondary">
+                                <i class="bi bi-chat-dots"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'properties_list' %}" class="btn btn-outline-success btn-lg">
+                Barcha mulklarni ko'rish
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-success text-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <h2 class="display-6 fw-bold">{{ total_properties }}+</h2>
+                <p>E'lon qilingan mulklar</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="display-6 fw-bold">{{ total_companies }}+</h2>
+                <p>Ishonchli rieltorlar</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="display-6 fw-bold">{{ total_customers }}+</h2>
+                <p>Mamnun mijozlar</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="display-6 fw-bold">{{ satisfaction_rate }}%</h2>
+                <p>Mamnunlik darajasi</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Companies Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Ishonchli hamkorlarimiz</h2>
+            <p class="lead text-muted">Professional rieltorlar va qurilish kompaniyalari</p>
+        </div>
+        
+        <div class="row">
+            {% for company in companies %}
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        {% if company.logo %}
+                            <img src="{{ company.logo.url }}" class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
+                        {% else %}
+                            <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-building text-white fs-2"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <h5 class="card-title">{{ company.name }}</h5>
+                        <p class="text-muted small">{{ company.description|truncatechars:100 }}</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary">{{ company.get_company_type_display }}</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span><i class="bi bi-star-fill text-warning"></i> {{ company.rating }}</span>
+                            <span>{{ company.total_sales }} sotuv</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'company_detail' company.pk %}" class="btn btn-outline-success btn-sm">
+                            Kompaniyani ko'rish
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'companies_list' %}" class="btn btn-outline-success btn-lg">
+                Barcha kompaniyalarni ko'rish
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addToComparison(propertyId) {
+    fetch('{% url "add_to_comparison" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'property_id=' + propertyId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert('Mulk ' + (data.action === 'added' ? 'qo\'shildi' : 'olib tashlandi'));
+        }
+    });
+}
+</script>
+{% endblock %}
